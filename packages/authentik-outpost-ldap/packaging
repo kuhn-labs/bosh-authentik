@@ -1,0 +1,7 @@
+set -e -x
+
+mkdir -p ${BOSH_INSTALL_TARGET}/bin
+
+# Copy the pre-compiled LDAP outpost binary
+cp outposts/ldap/authentik-ldap-* ${BOSH_INSTALL_TARGET}/bin/authentik-ldap
+chmod +x ${BOSH_INSTALL_TARGET}/bin/authentik-ldap

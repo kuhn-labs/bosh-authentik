@@ -1,0 +1,5 @@
+check process authentik-ldap-outpost
+  with pidfile /var/vcap/sys/run/bpm/authentik-ldap-outpost/authentik-ldap-outpost.pid
+  start program "/var/vcap/jobs/bpm/bin/bpm start authentik-ldap-outpost"
+  stop program "/var/vcap/jobs/bpm/bin/bpm stop authentik-ldap-outpost"
+  group vcap

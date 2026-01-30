@@ -1,0 +1,7 @@
+set -e -x
+
+mkdir -p ${BOSH_INSTALL_TARGET}/bin
+
+# Copy the pre-compiled RADIUS outpost binary
+cp outposts/radius/authentik-radius-* ${BOSH_INSTALL_TARGET}/bin/authentik-radius
+chmod +x ${BOSH_INSTALL_TARGET}/bin/authentik-radius

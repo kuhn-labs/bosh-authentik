@@ -1,0 +1,5 @@
+check process authentik-server
+  with pidfile /var/vcap/sys/run/bpm/authentik-server/authentik-server.pid
+  start program "/var/vcap/jobs/bpm/bin/bpm start authentik-server"
+  stop program "/var/vcap/jobs/bpm/bin/bpm stop authentik-server"
+  group vcap

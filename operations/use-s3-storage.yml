@@ -1,0 +1,73 @@
+# Use this ops file to configure S3 storage for authentik media files
+#
+# Usage:
+#   bosh deploy manifests/authentik.yml \
+#     -o operations/use-s3-storage.yml \
+#     -v s3_region=us-east-1 \
+#     -v s3_bucket_name=my-authentik-bucket \
+#     -v s3_access_key=AKIAXXXXXXXX \
+#     -v s3_secret_key=xxxxxxxx
+
+# Configure S3 storage for server
+- type: replace
+  path: /instance_groups/name=authentik/jobs/name=authentik-server/properties/storage?
+  value:
+    media:
+      backend: s3
+    s3:
+      region: ((s3_region))
+      endpoint: ((s3_endpoint))
+      access_key: ((s3_access_key))
+      secret_key: ((s3_secret_key))
+      bucket_name: ((s3_bucket_name))
+      use_ssl: ((s3_use_ssl))
+
+# Configure S3 storage for worker
+- type: replace
+  path: /instance_groups/name=authentik/jobs/name=authentik-worker/properties/storage?
+  value:
+    media:
+      backend: s3
+    s3:
+      region: ((s3_region))
+      endpoint: ((s3_endpoint))
+      access_key: ((s3_access_key))
+      secret_key: ((s3_secret_key))
+      bucket_name: ((s3_bucket_name))
+      use_ssl: ((s3_use_ssl))
+
+# Add variables
+- type: replace
+  path: /variables?/-
+  value:
+    name: s3_region
+    type: value
+- type: replace
+  path: /variables?/-
+  value:
+    name: s3_endpoint
+    type: value
+    options:
+      default: ""
+- type: replace
+  path: /variables?/-
+  value:
+    name: s3_bucket_name
+    type: value
+- type: replace
+  path: /variables?/-
+  value:
+    name: s3_access_key
+    type: value
+- type: replace
+  path: /variables?/-
+  value:
+    name: s3_secret_key
+    type: password
+- type: replace
+  path: /variables?/-
+  value:
+    name: s3_use_ssl
+    type: value
+    options:
+      default: true

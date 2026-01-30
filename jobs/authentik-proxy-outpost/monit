@@ -1,0 +1,5 @@
+check process authentik-proxy-outpost
+  with pidfile /var/vcap/sys/run/bpm/authentik-proxy-outpost/authentik-proxy-outpost.pid
+  start program "/var/vcap/jobs/bpm/bin/bpm start authentik-proxy-outpost"
+  stop program "/var/vcap/jobs/bpm/bin/bpm stop authentik-proxy-outpost"
+  group vcap

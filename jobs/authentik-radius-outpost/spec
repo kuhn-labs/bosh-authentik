@@ -1,0 +1,34 @@
+---
+name: authentik-radius-outpost
+
+templates:
+  bpm.yml.erb: config/bpm.yml
+  pre-start.erb: bin/pre-start
+
+packages:
+  - authentik-outpost-radius
+
+consumes:
+  - name: authentik
+    type: authentik
+    optional: true
+
+properties:
+  authentik.host:
+    description: "Authentik server URL (e.g., https://authentik.example.com)"
+  authentik.token:
+    description: "Authentik API token for outpost authentication"
+  authentik.insecure:
+    description: "Skip TLS verification when connecting to authentik"
+    default: false
+
+  radius_port:
+    description: "RADIUS port"
+    default: 1812
+  metrics_port:
+    description: "Prometheus metrics port"
+    default: 9300
+
+  log_level:
+    description: "Log level (debug, info, warning, error, trace)"
+    default: "info"

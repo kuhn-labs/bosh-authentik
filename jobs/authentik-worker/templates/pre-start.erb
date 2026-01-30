@@ -1,0 +1,12 @@
+#!/bin/bash
+set -eu
+
+# Create necessary directories
+mkdir -p /var/vcap/store/authentik/{media,blueprints,certs,templates}
+mkdir -p /var/vcap/data/authentik-worker
+
+# Set proper permissions
+chown -R vcap:vcap /var/vcap/store/authentik
+chown -R vcap:vcap /var/vcap/data/authentik-worker
+
+echo "Pre-start completed successfully"

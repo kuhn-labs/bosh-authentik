@@ -1,0 +1,79 @@
+# Use this ops file to connect to an external PostgreSQL database
+# instead of deploying PostgreSQL with the release
+#
+# Usage:
+#   bosh deploy manifests/authentik.yml \
+#     -o operations/use-external-postgres.yml \
+#     -v postgres_host=my-postgres.example.com \
+#     -v postgres_password=mypassword
+
+# Remove the postgres instance group
+- type: remove
+  path: /instance_groups/name=postgres
+
+# Remove the database link consumption from server
+- type: remove
+  path: /instance_groups/name=authentik/jobs/name=authentik-server/consumes
+
+# Remove the database link consumption from worker
+- type: replace
+  path: /instance_groups/name=authentik/jobs/name=authentik-worker/consumes
+  value:
+    authentik: {from: authentik}
+
+# Configure external database for server
+- type: replace
+  path: /instance_groups/name=authentik/jobs/name=authentik-server/properties/postgresql?
+  value:
+    host: ((postgres_host))
+    port: ((postgres_port))
+    user: ((postgres_user))
+    password: ((postgres_password))
+    database: ((postgres_database))
+    sslmode: ((postgres_sslmode))
+
+# Configure external database for worker
+- type: replace
+  path: /instance_groups/name=authentik/jobs/name=authentik-worker/properties/postgresql?
+  value:
+    host: ((postgres_host))
+    port: ((postgres_port))
+    user: ((postgres_user))
+    password: ((postgres_password))
+    database: ((postgres_database))
+    sslmode: ((postgres_sslmode))
+
+# Add variables for external postgres
+- type: replace
+  path: /variables?/-
+  value:
+    name: postgres_host
+    type: value
+- type: replace
+  path: /variables?/-
+  value:
+    name: postgres_port
+    type: value
+    options:
+      default: 5432
+- type: replace
+  path: /variables?/-
+  value:
+    name: postgres_user
+    type: value
+    options:
+      default: authentik
+- type: replace
+  path: /variables?/-
+  value:
+    name: postgres_database
+    type: value
+    options:
+      default: authentik
+- type: replace
+  path: /variables?/-
+  value:
+    name: postgres_sslmode
+    type: value
+    options:
+      default: prefer

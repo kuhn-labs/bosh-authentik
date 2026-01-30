@@ -1,0 +1,29 @@
+# Use this ops file to add a proxy outpost for reverse proxy authentication
+#
+# Prerequisites:
+# 1. Deploy authentik core first (server + worker)
+# 2. Create an outpost in the authentik UI and get the API token
+#
+# Usage:
+#   bosh deploy manifests/authentik.yml \
+#     -o operations/add-proxy-outpost.yml \
+#     -v authentik_proxy_outpost_token=<token-from-authentik-ui>
+
+- type: replace
+  path: /instance_groups/name=authentik/jobs/-
+  value:
+    name: authentik-proxy-outpost
+    release: authentik
+    consumes:
+      authentik: {from: authentik}
+    properties:
+      authentik:
+        token: ((authentik_proxy_outpost_token))
+      http_port: 9080
+      https_port: 9444
+
+- type: replace
+  path: /variables?/-
+  value:
+    name: authentik_proxy_outpost_token
+    type: value

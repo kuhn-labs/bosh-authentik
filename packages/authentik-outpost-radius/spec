@@ -1,0 +1,7 @@
+---
+name: authentik-outpost-radius
+
+dependencies: []
+
+files:
+  - outposts/radius/authentik-radius-*

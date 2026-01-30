@@ -1,0 +1,23 @@
+# Use this ops file to scale authentik for high availability
+#
+# Usage:
+#   bosh deploy manifests/authentik.yml \
+#     -o operations/scale-authentik.yml \
+#     -v authentik_instances=3
+
+- type: replace
+  path: /instance_groups/name=authentik/instances
+  value: ((authentik_instances))
+
+# Distribute across availability zones
+- type: replace
+  path: /instance_groups/name=authentik/azs
+  value: [z1, z2, z3]
+
+- type: replace
+  path: /variables?/-
+  value:
+    name: authentik_instances
+    type: value
+    options:
+      default: 3

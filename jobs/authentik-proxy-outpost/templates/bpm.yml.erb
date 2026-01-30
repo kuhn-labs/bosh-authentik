@@ -1,0 +1,24 @@
+<%
+  # Determine authentik host from link or property
+  if_link('authentik') do |auth|
+    authentik_host = "http://#{auth.instances.first.address}:#{auth.p('port', 9000)}"
+  end.else do
+    authentik_host = p('authentik.host')
+  end
+-%>
+processes:
+  - name: authentik-proxy-outpost
+    executable: /var/vcap/packages/authentik-outpost-proxy/bin/authentik-proxy
+    env:
+      AUTHENTIK_HOST: <%= authentik_host %>
+      AUTHENTIK_TOKEN: <%= p('authentik.token') %>
+      AUTHENTIK_INSECURE: "<%= p('authentik.insecure') %>"
+      AUTHENTIK_LISTEN__HTTP: "0.0.0.0:<%= p('http_port') %>"
+      AUTHENTIK_LISTEN__HTTPS: "0.0.0.0:<%= p('https_port') %>"
+      AUTHENTIK_LISTEN__METRICS: "0.0.0.0:<%= p('metrics_port') %>"
+      AUTHENTIK_LOG_LEVEL: <%= p('log_level') %>
+      HOME: /var/vcap/data/authentik-proxy-outpost
+    limits:
+      open_files: 65536
+    hooks:
+      pre_start: /var/vcap/jobs/authentik-proxy-outpost/bin/pre-start

@@ -1,0 +1,10 @@
+---
+name: authentik
+
+dependencies:
+  - python3
+
+files:
+  - authentik/authentik-*.tar.gz
+  - authentik/vendor/**/*
+  - authentik/web-dist.tar.gz

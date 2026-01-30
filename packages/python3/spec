@@ -1,0 +1,9 @@
+---
+name: python3
+
+dependencies: []
+
+files:
+  - python/Python-3.12.*.tar.xz
+  - python/setuptools-*.tar.gz
+  - python/pip-*.tar.gz

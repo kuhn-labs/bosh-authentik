@@ -1,0 +1,22 @@
+#!/bin/bash
+set -eu
+
+# Source environment
+source /var/vcap/jobs/authentik-server/config/env.sh
+
+# Create necessary directories
+mkdir -p /var/vcap/store/authentik/{media,blueprints,certs,templates}
+mkdir -p /var/vcap/data/authentik-server
+
+# Set proper permissions
+chown -R vcap:vcap /var/vcap/store/authentik
+chown -R vcap:vcap /var/vcap/data/authentik-server
+
+# Run database migrations
+echo "Running database migrations..."
+cd /var/vcap/packages/authentik
+python -m manage migrate --noinput || {
+  echo "Migration failed, but continuing..."
+}
+
+echo "Pre-start completed successfully"

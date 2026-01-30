@@ -1,0 +1,38 @@
+processes:
+  - name: authentik-server
+    executable: /var/vcap/packages/authentik/bin/gunicorn-ak
+    args:
+      - authentik.root.asgi:application
+      - --bind
+      - 0.0.0.0:<%= p('port') %>
+      - --workers
+      - "<%= p('web.workers') %>"
+      - --threads
+      - "<%= p('web.threads') %>"
+      - --worker-class
+      - uvicorn.workers.UvicornWorker
+      - --access-logfile
+      - "-"
+      - --error-logfile
+      - "-"
+      - --capture-output
+      - --timeout
+      - "300"
+      - --graceful-timeout
+      - "30"
+    env:
+      HOME: /var/vcap/data/authentik-server
+      AUTHENTIK_CONFIG_FILE: /var/vcap/jobs/authentik-server/config/authentik.yml
+      PATH: /var/vcap/packages/python3/bin:/var/vcap/packages/authentik/bin:/usr/bin:/bin
+      LD_LIBRARY_PATH: /var/vcap/packages/python3/lib
+      PYTHONPATH: /var/vcap/packages/authentik/lib/python3.12/site-packages
+    limits:
+      open_files: 65536
+    persistent_disk: true
+    additional_volumes:
+      - path: /var/vcap/store/authentik
+        writable: true
+      - path: /var/vcap/data/authentik-server
+        writable: true
+    hooks:
+      pre_start: /var/vcap/jobs/authentik-server/bin/pre-start

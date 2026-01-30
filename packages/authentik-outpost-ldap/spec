@@ -1,0 +1,7 @@
+---
+name: authentik-outpost-ldap
+
+dependencies: []
+
+files:
+  - outposts/ldap/authentik-ldap-*

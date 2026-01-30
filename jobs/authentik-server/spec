@@ -1,0 +1,164 @@
+---
+name: authentik-server
+
+templates:
+  bpm.yml.erb: config/bpm.yml
+  env.sh.erb: config/env.sh
+  pre-start.erb: bin/pre-start
+  authentik.yml.erb: config/authentik.yml
+
+packages:
+  - python3
+  - authentik
+
+consumes:
+  - name: database
+    type: database
+    optional: true
+
+provides:
+  - name: authentik
+    type: authentik
+    properties:
+      - port
+      - https_port
+
+properties:
+  authentik.secret_key:
+    description: "Secret key for signing cookies and tokens"
+
+  port:
+    description: "HTTP port for authentik server"
+    default: 9000
+  https_port:
+    description: "HTTPS port for authentik server"
+    default: 9443
+  metrics_port:
+    description: "Prometheus metrics port"
+    default: 9300
+
+  postgresql.host:
+    description: "PostgreSQL host"
+  postgresql.port:
+    description: "PostgreSQL port"
+    default: 5432
+  postgresql.user:
+    description: "PostgreSQL user"
+    default: "authentik"
+  postgresql.password:
+    description: "PostgreSQL password"
+  postgresql.database:
+    description: "PostgreSQL database name"
+    default: "authentik"
+  postgresql.sslmode:
+    description: "PostgreSQL SSL mode (disable, allow, prefer, require, verify-ca, verify-full)"
+    default: "prefer"
+
+  cache.timeout:
+    description: "Cache timeout in seconds"
+    default: 300
+  cache.timeout_flows:
+    description: "Flow plan cache timeout in seconds"
+    default: 300
+  cache.timeout_policies:
+    description: "Policy cache timeout in seconds"
+    default: 300
+
+  web.workers:
+    description: "Number of Gunicorn workers"
+    default: 2
+  web.threads:
+    description: "Number of threads per worker"
+    default: 4
+
+  email.host:
+    description: "SMTP server hostname"
+    default: "localhost"
+  email.port:
+    description: "SMTP server port"
+    default: 25
+  email.username:
+    description: "SMTP username"
+    default: ""
+  email.password:
+    description: "SMTP password"
+    default: ""
+  email.use_tls:
+    description: "Use TLS for SMTP"
+    default: false
+  email.use_ssl:
+    description: "Use SSL for SMTP"
+    default: false
+  email.from:
+    description: "From email address"
+    default: "authentik@localhost"
+  email.timeout:
+    description: "SMTP timeout in seconds"
+    default: 10
+
+  log_level:
+    description: "Log level (debug, info, warning, error)"
+    default: "info"
+
+  cookie_domain:
+    description: "Domain for session cookies"
+    default: ""
+
+  disable_update_check:
+    description: "Disable update check"
+    default: true
+
+  disable_startup_analytics:
+    description: "Disable startup analytics"
+    default: true
+
+  error_reporting.enabled:
+    description: "Enable error reporting to Sentry"
+    default: false
+
+  storage.media.backend:
+    description: "Media storage backend (file or s3)"
+    default: "file"
+
+  storage.s3.region:
+    description: "S3 region"
+    default: ""
+  storage.s3.endpoint:
+    description: "S3 endpoint URL"
+    default: ""
+  storage.s3.access_key:
+    description: "S3 access key"
+    default: ""
+  storage.s3.secret_key:
+    description: "S3 secret key"
+    default: ""
+  storage.s3.bucket_name:
+    description: "S3 bucket name"
+    default: ""
+  storage.s3.use_ssl:
+    description: "Use SSL for S3"
+    default: true
+
+  trusted_proxy_cidrs:
+    description: "Trusted proxy CIDRs for forwarded headers"
+    default:
+      - "127.0.0.0/8"
+      - "10.0.0.0/8"
+      - "172.16.0.0/12"
+      - "192.168.0.0/16"
+
+  avatars:
+    description: "Avatar providers (comma-separated: gravatar, initials, none)"
+    default: "gravatar,initials"
+
+  footer_links:
+    description: "Custom footer links as array of {name, href} objects"
+    default: []
+
+  geoip.path:
+    description: "Path to GeoIP database for IP-based geolocation"
+    default: ""
+
+  impersonation:
+    description: "Allow user impersonation"
+    default: true

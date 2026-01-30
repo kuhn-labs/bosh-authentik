@@ -1,0 +1,27 @@
+# Use this ops file to add a RADIUS outpost
+#
+# Prerequisites:
+# 1. Deploy authentik core first (server + worker)
+# 2. Create an outpost in the authentik UI and get the API token
+#
+# Usage:
+#   bosh deploy manifests/authentik.yml \
+#     -o operations/add-radius-outpost.yml \
+#     -v authentik_radius_outpost_token=<token-from-authentik-ui>
+
+- type: replace
+  path: /instance_groups/name=authentik/jobs/-
+  value:
+    name: authentik-radius-outpost
+    release: authentik
+    consumes:
+      authentik: {from: authentik}
+    properties:
+      authentik:
+        token: ((authentik_radius_outpost_token))
+
+- type: replace
+  path: /variables?/-
+  value:
+    name: authentik_radius_outpost_token
+    type: value

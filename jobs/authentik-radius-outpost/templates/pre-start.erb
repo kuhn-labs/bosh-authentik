@@ -1,0 +1,10 @@
+#!/bin/bash
+set -eu
+
+# Create necessary directories
+mkdir -p /var/vcap/data/authentik-radius-outpost
+
+# Set proper permissions
+chown -R vcap:vcap /var/vcap/data/authentik-radius-outpost
+
+echo "Pre-start completed successfully"

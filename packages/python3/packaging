@@ -1,0 +1,36 @@
+set -e -x
+
+PYTHON_VERSION=3.12.4
+
+# Extract and compile Python
+tar xf python/Python-${PYTHON_VERSION}.tar.xz
+pushd Python-${PYTHON_VERSION}
+  ./configure \
+    --prefix=${BOSH_INSTALL_TARGET} \
+    --enable-optimizations \
+    --with-ensurepip=no \
+    --enable-shared \
+    LDFLAGS="-Wl,-rpath,${BOSH_INSTALL_TARGET}/lib"
+
+  make -j$(nproc)
+  make install
+popd
+
+# Set up library path for pip installation
+export LD_LIBRARY_PATH=${BOSH_INSTALL_TARGET}/lib:${LD_LIBRARY_PATH:-}
+
+# Install setuptools
+tar xf python/setuptools-*.tar.gz
+pushd setuptools-*
+  ${BOSH_INSTALL_TARGET}/bin/python3 setup.py install --prefix=${BOSH_INSTALL_TARGET}
+popd
+
+# Install pip
+tar xf python/pip-*.tar.gz
+pushd pip-*
+  ${BOSH_INSTALL_TARGET}/bin/python3 setup.py install --prefix=${BOSH_INSTALL_TARGET}
+popd
+
+# Create symlinks
+ln -sf ${BOSH_INSTALL_TARGET}/bin/python3 ${BOSH_INSTALL_TARGET}/bin/python
+ln -sf ${BOSH_INSTALL_TARGET}/bin/pip3 ${BOSH_INSTALL_TARGET}/bin/pip

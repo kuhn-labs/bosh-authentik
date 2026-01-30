@@ -1,0 +1,5 @@
+check process authentik-worker
+  with pidfile /var/vcap/sys/run/bpm/authentik-worker/authentik-worker.pid
+  start program "/var/vcap/jobs/bpm/bin/bpm start authentik-worker"
+  stop program "/var/vcap/jobs/bpm/bin/bpm stop authentik-worker"
+  group vcap

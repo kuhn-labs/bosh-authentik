@@ -1,0 +1,24 @@
+processes:
+  - name: authentik-worker
+    executable: /var/vcap/packages/python3/bin/python
+    args:
+      - -m
+      - manage
+      - worker
+    env:
+      HOME: /var/vcap/data/authentik-worker
+      AUTHENTIK_CONFIG_FILE: /var/vcap/jobs/authentik-worker/config/authentik.yml
+      PATH: /var/vcap/packages/python3/bin:/var/vcap/packages/authentik/bin:/usr/bin:/bin
+      LD_LIBRARY_PATH: /var/vcap/packages/python3/lib
+      PYTHONPATH: /var/vcap/packages/authentik/lib/python3.12/site-packages
+    working_dir: /var/vcap/packages/authentik
+    limits:
+      open_files: 65536
+    persistent_disk: true
+    additional_volumes:
+      - path: /var/vcap/store/authentik
+        writable: true
+      - path: /var/vcap/data/authentik-worker
+        writable: true
+    hooks:
+      pre_start: /var/vcap/jobs/authentik-worker/bin/pre-start

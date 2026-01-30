@@ -1,0 +1,11 @@
+---
+# Example private.yml for blobstore credentials
+# Copy this to config/private.yml and fill in your credentials
+
+blobstore:
+  provider: s3
+  options:
+    access_key_id: YOUR_ACCESS_KEY
+    secret_access_key: YOUR_SECRET_KEY
+    bucket_name: your-authentik-bosh-release-bucket
+    region: us-east-1

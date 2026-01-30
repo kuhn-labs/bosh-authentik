@@ -1,0 +1,24 @@
+# BOSH release artifacts
+.dev_builds/
+dev_releases/
+releases/
+blobs/
+.blobs/
+.final_builds/
+
+# Config files with credentials
+config/private.yml
+
+# IDE
+.idea/
+*.swp
+*.swo
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.tmp
+*.bak

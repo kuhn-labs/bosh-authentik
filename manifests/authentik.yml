@@ -1,0 +1,111 @@
+---
+name: authentik
+
+releases:
+  - name: authentik
+    version: latest
+  - name: bpm
+    version: latest
+  - name: postgres
+    version: latest
+
+stemcells:
+  - alias: default
+    os: ubuntu-jammy
+    version: latest
+
+update:
+  canaries: 1
+  max_in_flight: 1
+  canary_watch_time: 30000-600000
+  update_watch_time: 30000-600000
+
+instance_groups:
+  - name: postgres
+    instances: 1
+    azs: [z1]
+    vm_type: default
+    stemcell: default
+    persistent_disk_type: default
+    networks:
+      - name: default
+    jobs:
+      - name: postgres
+        release: postgres
+        provides:
+          postgres: {as: database}
+        properties:
+          databases:
+            port: 5432
+            databases:
+              - name: authentik
+            roles:
+              - name: authentik
+                password: ((postgres_password))
+
+  - name: authentik
+    instances: 1
+    azs: [z1]
+    vm_type: default
+    stemcell: default
+    persistent_disk_type: default
+    networks:
+      - name: default
+    jobs:
+      - name: bpm
+        release: bpm
+      - name: authentik-server
+        release: authentik
+        consumes:
+          database: {from: database}
+        provides:
+          authentik: {as: authentik}
+        properties:
+          authentik:
+            secret_key: ((authentik_secret_key))
+          postgresql:
+            user: authentik
+            password: ((postgres_password))
+            database: authentik
+          email:
+            host: ((smtp_host))
+            port: ((smtp_port))
+            use_tls: true
+            from: ((smtp_from))
+      - name: authentik-worker
+        release: authentik
+        consumes:
+          database: {from: database}
+          authentik: {from: authentik}
+        properties:
+          authentik:
+            secret_key: ((authentik_secret_key))
+          postgresql:
+            user: authentik
+            password: ((postgres_password))
+            database: authentik
+          email:
+            host: ((smtp_host))
+            port: ((smtp_port))
+            use_tls: true
+            from: ((smtp_from))
+
+variables:
+  - name: postgres_password
+    type: password
+  - name: authentik_secret_key
+    type: password
+    options:
+      length: 64
+  - name: smtp_host
+    type: value
+    options:
+      default: localhost
+  - name: smtp_port
+    type: value
+    options:
+      default: 25
+  - name: smtp_from
+    type: value
+    options:
+      default: authentik@localhost

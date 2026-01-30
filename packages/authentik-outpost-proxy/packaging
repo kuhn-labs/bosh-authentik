@@ -1,0 +1,7 @@
+set -e -x
+
+mkdir -p ${BOSH_INSTALL_TARGET}/bin
+
+# Copy the pre-compiled proxy outpost binary
+cp outposts/proxy/authentik-proxy-* ${BOSH_INSTALL_TARGET}/bin/authentik-proxy
+chmod +x ${BOSH_INSTALL_TARGET}/bin/authentik-proxy

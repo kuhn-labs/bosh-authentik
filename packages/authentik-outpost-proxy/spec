@@ -1,0 +1,7 @@
+---
+name: authentik-outpost-proxy
+
+dependencies: []
+
+files:
+  - outposts/proxy/authentik-proxy-*

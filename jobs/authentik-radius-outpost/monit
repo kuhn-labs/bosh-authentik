@@ -1,0 +1,5 @@
+check process authentik-radius-outpost
+  with pidfile /var/vcap/sys/run/bpm/authentik-radius-outpost/authentik-radius-outpost.pid
+  start program "/var/vcap/jobs/bpm/bin/bpm start authentik-radius-outpost"
+  stop program "/var/vcap/jobs/bpm/bin/bpm stop authentik-radius-outpost"
+  group vcap

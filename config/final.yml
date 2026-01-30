@@ -1,0 +1,6 @@
+---
+name: authentik
+blobstore:
+  provider: local
+  options:
+    blobstore_path: /tmp/authentik-blobs
