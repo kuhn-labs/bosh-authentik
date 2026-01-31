@@ -1,17 +1,14 @@
 name: Build Tanzu Operations Manager Tile
 
 on:
+  # Push to main or version tags
+  # Note: No paths filter here because it prevents tag triggers from working
   push:
     branches:
       - main
     tags:
       - 'v*'
-    # Note: paths filter only applies to branch pushes, not tag pushes
-    paths:
-      - 'jobs/**'
-      - 'packages/**'
-      - 'tile/**'
-      - '.github/workflows/build-tile.yml'
+  # PRs can use paths filter since they always have file changes
   pull_request:
     branches:
       - main
@@ -48,8 +45,6 @@ jobs:
   build-tile:
     name: Build Tile
     runs-on: ubuntu-latest
-    # Always run for tags (paths filter doesn't work with tags)
-    if: github.event_name != 'push' || !contains(github.ref, 'refs/heads/') || github.ref == 'refs/heads/main'
 
     outputs:
       tile_version: ${{ steps.version.outputs.version }}
