@@ -36,8 +36,8 @@ on:
         type: boolean
 
 env:
-  TILE_VERSION: ${{ github.event.inputs.version || '2025.12.1' }}
-  AUTHENTIK_VERSION: ${{ github.event.inputs.authentik_version || '2025.12.1' }}
+  TILE_VERSION: '2025.12.1'
+  AUTHENTIK_VERSION: '2025.12.1'
   BPM_VERSION: '1.2.20'
   POSTGRES_VERSION: '53'
 
@@ -49,6 +49,7 @@ jobs:
     outputs:
       tile_version: ${{ steps.version.outputs.version }}
       tile_name: ${{ steps.package.outputs.tile_name }}
+      authentik_version: ${{ steps.version.outputs.authentik_version }}
       bpm_version: ${{ steps.versions.outputs.bpm_version }}
       postgres_version: ${{ steps.versions.outputs.postgres_version }}
 
@@ -59,14 +60,25 @@ jobs:
       - name: Determine version
         id: version
         run: |
+          # Use input version for workflow_dispatch, tag version for tags, default otherwise
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             VERSION="${{ github.ref_name }}"
             VERSION="${VERSION#v}"  # Remove 'v' prefix
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.version }}" ]]; then
+            VERSION="${{ github.event.inputs.version }}"
           else
             VERSION="${{ env.TILE_VERSION }}"
           fi
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "Building tile version: ${VERSION}"
+
+          # Also determine authentik version
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.authentik_version }}" ]]; then
+            AUTHENTIK_VER="${{ github.event.inputs.authentik_version }}"
+          else
+            AUTHENTIK_VER="${{ env.AUTHENTIK_VERSION }}"
+          fi
+          echo "authentik_version=${AUTHENTIK_VER}" >> $GITHUB_OUTPUT
 
       - name: Export dependency versions
         id: versions
@@ -97,9 +109,9 @@ jobs:
           path: |
             blobs/
             .blobs/
-          key: blobs-${{ env.AUTHENTIK_VERSION }}-${{ hashFiles('config/blobs.yml') }}
+          key: blobs-${{ steps.version.outputs.authentik_version }}-${{ hashFiles('config/blobs.yml') }}
           restore-keys: |
-            blobs-${{ env.AUTHENTIK_VERSION }}-
+            blobs-${{ steps.version.outputs.authentik_version }}-
             blobs-
 
       - name: Download Python blobs
@@ -131,7 +143,7 @@ jobs:
 
       - name: Download Authentik source and dependencies
         env:
-          AUTHENTIK_VERSION: ${{ env.AUTHENTIK_VERSION }}
+          AUTHENTIK_VERSION: ${{ steps.version.outputs.authentik_version }}
         run: |
           mkdir -p blobs/authentik/vendor
 
@@ -166,7 +178,7 @@ jobs:
 
       - name: Download outpost binaries
         env:
-          AUTHENTIK_VERSION: ${{ env.AUTHENTIK_VERSION }}
+          AUTHENTIK_VERSION: ${{ steps.version.outputs.authentik_version }}
         run: |
           mkdir -p blobs/outposts/{ldap,radius,proxy}
 
@@ -192,7 +204,7 @@ jobs:
 
       - name: Add blobs to BOSH release
         env:
-          AUTHENTIK_VERSION: ${{ env.AUTHENTIK_VERSION }}
+          AUTHENTIK_VERSION: ${{ steps.version.outputs.authentik_version }}
         run: |
           # Python blobs
           bosh add-blob blobs/python/Python-3.12.4.tar.xz python/Python-3.12.4.tar.xz
