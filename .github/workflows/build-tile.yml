@@ -213,18 +213,17 @@ jobs:
 
           OUTPOST_BASE="https://github.com/goauthentik/authentik/releases/download/version%2F${AUTHENTIK_VERSION}"
 
-          # Download outposts with proper error handling
-          # Use -f to fail on HTTP errors (404, etc.) and don't create empty files
+          # Upstream publishes authentik-outpost-<name>_linux_amd64. The
+          # package specs and packaging scripts glob authentik-<name>-*, so
+          # save each binary as authentik-<name>-linux-amd64. The outpost
+          # packages are required by the outpost jobs, so a missing binary
+          # must fail here, not later in `bosh create-release`.
           for outpost in ldap radius proxy; do
             echo "Downloading ${outpost} outpost..."
-            if curl -fSL -o "blobs/outposts/${outpost}/authentik-${outpost}_linux_amd64" \
-                 "${OUTPOST_BASE}/authentik-${outpost}_linux_amd64" 2>/dev/null; then
-              echo "  ✓ ${outpost} outpost downloaded"
-              chmod +x "blobs/outposts/${outpost}/authentik-${outpost}_linux_amd64"
-            else
-              echo "  ⚠ ${outpost} outpost not available for this version (optional)"
-              rm -f "blobs/outposts/${outpost}/authentik-${outpost}_linux_amd64"
-            fi
+            curl -fsSL -o "blobs/outposts/${outpost}/authentik-${outpost}-linux-amd64" \
+              "${OUTPOST_BASE}/authentik-outpost-${outpost}_linux_amd64"
+            chmod +x "blobs/outposts/${outpost}/authentik-${outpost}-linux-amd64"
+            echo "  ✓ ${outpost} outpost downloaded"
           done
 
           echo ""
@@ -280,11 +279,9 @@ jobs:
           # Outpost binaries
           echo "=== Adding outpost binaries ==="
           for outpost in ldap radius proxy; do
-            if [ -f "blobs/outposts/${outpost}/authentik-${outpost}_linux_amd64" ]; then
-              bosh add-blob "blobs/outposts/${outpost}/authentik-${outpost}_linux_amd64" \
-                "outposts/${outpost}/authentik-${outpost}_linux_amd64"
-              echo "  ✓ ${outpost} outpost added"
-            fi
+            bosh add-blob "blobs/outposts/${outpost}/authentik-${outpost}-linux-amd64" \
+              "outposts/${outpost}/authentik-${outpost}-linux-amd64"
+            echo "  ✓ ${outpost} outpost added"
           done
 
           echo ""
